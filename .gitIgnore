@@ -1,0 +1,54 @@
+# Node.js dependencies
+/node_modules/
+
+# TypeScript 빌드 아웃풋
+/dist/
+/build/
+/lib/
+
+# 환경설정·비밀 키
+.env
+.env.*.local
+!.env.example    # 예시 파일만 커밋
+
+# 로그 파일
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 테스트 커버리지
+coverage/
+*.lcov
+
+# 시스템 파일
+.DS_Store
+Thumbs.db
+
+# IDE/에디터
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS 스왑/잠금
+*.swp
+*~
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Mac 파일 메타데이터
+.AppleDouble
+.LSOverride
+
+# Docker
+docker-compose.override.yml
+.env.docker
+
+# PM2 process file
+pm2.log
+pids/
