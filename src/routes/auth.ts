@@ -41,7 +41,8 @@ function signRefreshToken(user: User) {
 }
 
 authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response) => {
-    console.log("body : ", req.body)
+/*  #swagger.tags = ['Auth']
+*/
     const { loginType, jwt: socialToken, name } = req.body;
     let socialId: string;
 
@@ -51,7 +52,6 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
                 // audience: process.env.APPLE_APP_ID!,
             });
             socialId=payload.sub;
-            console.log("payload : ", payload)
         } else {
             socialId="test"
         }
@@ -71,15 +71,9 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
         const accessToken  = signAccessToken(user);
         const refreshToken = signRefreshToken(user);
 
-        console.log("accessToken : ", accessToken);
-
-        console.log("refreshToken : ", refreshToken);
-
-        res.ok(200, "", {accessToken, refreshToken})
+        res.ok(200, "", {accessToken, refreshToken});
 
     } catch (err: any) {
-        console.error("login error:", err);
-
         res
         .status(401)
         .json({ success: false, message: "인증 실패", detail: err.message });
@@ -87,6 +81,8 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
 });
 
 authRouter.post("/refresh", async (req: Request<{}, {}, { refreshToken: string }>, res) => {
+/*  #swagger.tags = ['Auth']
+*/
     const { refreshToken } = req.body;
     try {
         const decoded: any = jwt.decode(refreshToken);
@@ -107,7 +103,7 @@ authRouter.post("/refresh", async (req: Request<{}, {}, { refreshToken: string }
         const accessToken  = signAccessToken(user);
         const newRefreshToken = signRefreshToken(user);
 
-        res.ok(200, "", {accessToken, refreshToken})
+        res.ok(200, "", {accessToken, refreshToken});
 
     } catch (err: any) {
         console.error("refresh error:", err);

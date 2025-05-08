@@ -1,16 +1,14 @@
 import { Router } from "express";
 import { Types } from "mongoose";
-import { authToken } from "../middleware/authenticate";
 import { ScheduleModel } from "../models/calendar/schedule";
 import { TodoModel } from "../models/calendar/todo";
 import { DiaryModel } from "../models/calendar/diary";
 
 export const calendarRouter = Router();
 
-calendarRouter.use(authToken);
-
-
 calendarRouter.post('/schedule', async (req, res) => {
+/*  #swagger.tags = ['Calendar']
+*/
     try {
         const { title, startDate, endDate, memo, color, shared } = req.body;
 
@@ -27,10 +25,7 @@ calendarRouter.post('/schedule', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.status(201).json({
-            success: true,
-            schedule,
-        });
+        res.ok(201);
     } catch (err: any) {
         console.error("Schedule create error:", err);
         res.status(400).json({
@@ -41,6 +36,8 @@ calendarRouter.post('/schedule', async (req, res) => {
 });
 
 calendarRouter.patch('/schedule/:id', async (req, res) => { 
+/*  #swagger.tags = ['Calendar']
+*/
     const { id } = req.params;
     const userId = req.user?.id;
 
@@ -91,7 +88,7 @@ calendarRouter.patch('/schedule/:id', async (req, res) => {
         });
     }
 
-    res.status(200).json({success: true})
+    res.ok(200);
 
     } catch (err: any) {
         console.error("Schedule update error:", err);
@@ -103,6 +100,8 @@ calendarRouter.patch('/schedule/:id', async (req, res) => {
 });
 
 calendarRouter.delete('/schedule/:id', async (req, res) => {
+/*  #swagger.tags = ['Schedule']
+*/
     const { id } = req.params;
     const userId = req.user?.id;
 
@@ -135,6 +134,8 @@ calendarRouter.delete('/schedule/:id', async (req, res) => {
 });
 
 calendarRouter.post('/todo', async (req, res) => {
+/*  #swagger.tags = ['Calendar']
+*/
     try {
         const { title, isDone, endDate, memo, color, shared } = req.body;
 
@@ -151,10 +152,7 @@ calendarRouter.post('/todo', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.status(201).json({
-            success: true,
-            todo,
-        });
+        res.ok(201);
     } catch (err: any) {
         console.error("todo create error:", err);
         res.status(400).json({
@@ -165,6 +163,8 @@ calendarRouter.post('/todo', async (req, res) => {
 });
 
 calendarRouter.patch('/todo/:id', async (req, res) => { 
+/*  #swagger.tags = ['Calendar']
+*/
     const { id } = req.params;
     const userId = req.user?.id;
 
@@ -215,7 +215,7 @@ calendarRouter.patch('/todo/:id', async (req, res) => {
         });
     }
 
-    res.status(200).json({success: true})
+    res.ok(200);
 
     } catch (err: any) {
     console.error("Schedule update error:", err);
@@ -227,6 +227,8 @@ calendarRouter.patch('/todo/:id', async (req, res) => {
 });
 
 calendarRouter.delete('/todo/:id', async (req, res) => {
+/*  #swagger.tags = ['Calendar']
+*/
     const { id } = req.params;
     const userId = req.user?.id;
 
@@ -259,6 +261,8 @@ calendarRouter.delete('/todo/:id', async (req, res) => {
 });
 
 calendarRouter.post('/diary', async (req, res) => {
+/*  #swagger.tags = ['Calendar']
+*/
     try {
         const { date, content, shared } = req.body;
 
@@ -272,10 +276,7 @@ calendarRouter.post('/diary', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.status(201).json({
-            success: true,
-            diary,
-        });
+        res.ok(201)
     } catch (err: any) {
         console.error("todo create error:", err);
         res.status(400).json({
@@ -286,6 +287,8 @@ calendarRouter.post('/diary', async (req, res) => {
 });
 
 calendarRouter.patch('/diary/:id', async (req, res) => { 
+/*  #swagger.tags = ['Calendar']
+*/
     const { id } = req.params;
     const userId = req.user?.id;
 
@@ -326,6 +329,8 @@ calendarRouter.patch('/diary/:id', async (req, res) => {
 });
 
 calendarRouter.delete('/diary/:id', async (req, res) => {
+/*  #swagger.tags = ['Calendar']
+*/
     const { id } = req.params;
     const userId = req.user?.id;
 
@@ -359,6 +364,8 @@ calendarRouter.delete('/diary/:id', async (req, res) => {
 
 
 calendarRouter.get('/calendar', async (req, res) => {
+/*  #swagger.tags = ['Calendar']
+*/
     try {
         const { startDate, endDate } = req.query;
         const userId = req.user?.id;
@@ -402,7 +409,7 @@ calendarRouter.get('/calendar', async (req, res) => {
         todos,
         schedules,
         diaries
-    })
+    });
 
     } catch (err: any) {
         res.status(500).json({error: "조회 중 에러 발생"});

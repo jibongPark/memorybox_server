@@ -1,5 +1,7 @@
 import express, { Application, Request, Response } from 'express'
 import { responseFormatter } from './lib/response'
+import swaggerUi from 'swagger-ui-express';
+import swaggerFile from '../swagger-output.json'
 
 import mongoose from "mongoose";
 
@@ -15,7 +17,14 @@ connectDB();
 
 const app: Application = express()
 
+// Swagger UI 제공
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
 app.use(express.json());
+
+import { authToken } from './middleware/authenticate';
+app.use(authToken);
+
 app.use(responseFormatter)
 app.use(authRouter);
 app.use(calendarRouter);

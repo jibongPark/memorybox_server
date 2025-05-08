@@ -27,9 +27,78 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-// 여행 데이터 + 이미지 저장
 tripRouter.post('/trip', upload.array('images'), async (req, res) => {
+/*  #swagger.tags = ['Trip']                                         */
+/*  #swagger.summary = '새 여행 생성'                                 */
+/*  #swagger.security = [{ BearerAuth: [] }]                         */
+/*  #swagger.consumes = ['multipart/form-data']                     */
+/*  #swagger.parameters['images'] = {
+        in: 'formData',
+        type: 'array',
+        items: { type: 'file' },
+        required: true,
+        description: '여행 사진들'
+    }                                                               */
+/*  #swagger.parameters['imageOrders'] = {
+        in: 'formData',
+        type: 'array',
+        items: { type: 'integer' },
+        description: '각 사진의 순번'
+    }                                                               */
+/*  #swagger.parameters['thumbIndex'] = {
+        in: 'formData',
+        type: 'integer',
+        required: true,
+        description: '썸네일로 사용할 인덱스'
+    }                                                               */
+/*  #swagger.parameters['startDate'] = {
+        in: 'formData',
+        type: 'string',
+        format: 'date',
+        required: true,
+        description: '여행 시작일 (YYYY-MM-DD)'
+    }                                                               */
+/*  #swagger.parameters['endDate'] = {
+        in: 'formData',
+        type: 'string',
+        format: 'date',
+        required: true,
+        description: '여행 종료일 (YYYY-MM-DD)'
+    }                                                               */
+/*  #swagger.parameters['memo'] = {
+        in: 'formData',
+        type: 'string',
+        description: '메모'
+    }                                                               */
+/*  #swagger.parameters['sigunguCode'] = {
+        in: 'formData',
+        type: 'integer',
+        required: true,
+        description: '시군구 코드'
+    }                                                               */
+/*  #swagger.parameters['centerX'] = {
+        in: 'formData',
+        type: 'number',
+        format: 'float',
+        required: true,
+        description: '지도 중심 경도'
+    }                                                               */
+/*  #swagger.parameters['centerY'] = {
+        in: 'formData',
+        type: 'number',
+        format: 'float',
+        required: true,
+        description: '지도 중심 위도'
+    }                                                               */
+/*  #swagger.responses[201] = {
+        description: 'Trip 생성 성공',
+        schema: { $ref: '#/definitions/Trip' }
+    }                                                               */
+/*  #swagger.responses[500] = {
+        description: '서버 오류',
+        schema: { $ref: '#/definitions/Error' }
+    }                                                               */
+      
   try {
     const {
         thumbIndex,
@@ -85,6 +154,8 @@ tripRouter.post('/trip', upload.array('images'), async (req, res) => {
 
 
 tripRouter.patch('/trip/:id', upload.array('images'), async (req, res) => {
+/*  #swagger.tags = ['Trip']
+*/
     try {
         const { tripId } = req.params;
         const userId = req.user?.id;
@@ -152,6 +223,7 @@ tripRouter.patch('/trip/:id', upload.array('images'), async (req, res) => {
 })
 
 tripRouter.delete('/trip/:id', async (req, res) => {
+/*  #swagger.tags = ['Trip']                                         */
 
     const { id } = req.params;
     const userId = req.user?.id;
@@ -182,6 +254,8 @@ tripRouter.delete('/trip/:id', async (req, res) => {
 });
 
 tripRouter.get('/trip', async (req: Request, res: Response) => {
+/*  #swagger.tags = ['Trip']
+*/
     try {
         const userId = req.user?.id;
         const { lastSync } = req.query;
@@ -209,6 +283,7 @@ tripRouter.get('/trip', async (req: Request, res: Response) => {
 });
 
 tripRouter.get('/tripImage/:filename', async(req, res) => {
+/*  #swagger.tags = ['Trip']                                         */
     const filePath = path.join(__dirname, '../../images', req.params.filename);
     res.sendFile(filePath)
 })
