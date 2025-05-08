@@ -52,3 +52,7 @@ docker-compose.override.yml
 # PM2 process file
 pm2.log
 pids/
+
+
+# image
+images/

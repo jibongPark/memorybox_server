@@ -75,7 +75,7 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
 
         console.log("refreshToken : ", refreshToken);
 
-        res.json({ success: true, accessToken, refreshToken })
+        res.ok(200, "", {accessToken, refreshToken})
 
     } catch (err: any) {
         console.error("login error:", err);
@@ -107,7 +107,7 @@ authRouter.post("/refresh", async (req: Request<{}, {}, { refreshToken: string }
         const accessToken  = signAccessToken(user);
         const newRefreshToken = signRefreshToken(user);
 
-        res.json({ success: true, accessToken, refreshToken: newRefreshToken });
+        res.ok(200, "", {accessToken, refreshToken})
 
     } catch (err: any) {
         console.error("refresh error:", err);

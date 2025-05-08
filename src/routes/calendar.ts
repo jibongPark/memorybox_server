@@ -94,12 +94,12 @@ calendarRouter.patch('/schedule/:id', async (req, res) => {
     res.status(200).json({success: true})
 
     } catch (err: any) {
-    console.error("Schedule update error:", err);
-    res.status(400).json({
-    success: false,
-    message: err.message,
-    });
-}
+        console.error("Schedule update error:", err);
+        res.status(400).json({
+        success: false,
+        message: err.message
+        });
+    }
 });
 
 calendarRouter.delete('/schedule/:id', async (req, res) => {
@@ -371,7 +371,7 @@ calendarRouter.get('/calendar', async (req, res) => {
         const start = new Date(startDate as string);
     const end = new Date(endDate as string);
 
-    // 📌 todo: endDate가 범위 안에 있는 항목
+    // todo: endDate가 범위 안에 있는 항목
     const todos = await TodoModel.find({
         author: userId,
         endDate: {
@@ -380,7 +380,7 @@ calendarRouter.get('/calendar', async (req, res) => {
         }
     });
 
-    // 📌 schedule: startDate 또는 endDate가 범위 안에 있는 항목
+    // schedule: startDate 또는 endDate가 범위 안에 있는 항목
     const schedules = await ScheduleModel.find({
         author: userId,
         $or: [
@@ -389,7 +389,7 @@ calendarRouter.get('/calendar', async (req, res) => {
         ]
     });
 
-    // 📌 diary: date가 범위 안에 있는 항목
+    // diary: date가 범위 안에 있는 항목
     const diaries = await DiaryModel.find({
         author: userId,
         date: {
@@ -398,11 +398,12 @@ calendarRouter.get('/calendar', async (req, res) => {
         }
     });
 
-    res.json({
-    todos,
-    schedules,
-    diaries
-    });
+    res.ok(200, "", {
+        todos,
+        schedules,
+        diaries
+    })
+
     } catch (err: any) {
         res.status(500).json({error: "조회 중 에러 발생"});
     }

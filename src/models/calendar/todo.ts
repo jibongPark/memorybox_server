@@ -43,8 +43,8 @@ const TodoSchema = new Schema<Todo>({
     },
     shared: [
     {
-        type:    Schema.Types.ObjectId,
-        ref:     "User",
+        type: Schema.Types.ObjectId,
+        ref: "User",
     },
     ],
 });
