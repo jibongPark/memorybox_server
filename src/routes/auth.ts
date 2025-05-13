@@ -43,10 +43,10 @@ function signRefreshToken(user: User) {
 authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response) => {
 /*  #swagger.tags = ['Auth']
 */
-    const { loginType, jwt: socialToken, name } = req.body;
-    let socialId: string;
-
     try {
+        const { loginType, jwt: socialToken, name } = req.body;
+        let socialId: string;
+        
         if( loginType == "apple") {
             const payload = await verifyIdToken(socialToken, {
                 // audience: process.env.APPLE_APP_ID!,
@@ -68,10 +68,11 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
         user.refreshSalt = newSalt;
         await user.save();
 
+        const userName = user.name
         const accessToken  = signAccessToken(user);
         const refreshToken = signRefreshToken(user);
 
-        res.ok(200, "", {accessToken, refreshToken});
+        res.ok(200, "", {userName, accessToken, refreshToken});
 
     } catch (err: any) {
         res

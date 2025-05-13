@@ -18,8 +18,8 @@
         ],
         "description": "",
         "responses": {
-          "401": {
-            "description": "Unauthorized"
+          "default": {
+            "description": ""
           }
         },
         "requestBody": {
@@ -51,8 +51,8 @@
         ],
         "description": "",
         "responses": {
-          "401": {
-            "description": "Unauthorized"
+          "default": {
+            "description": ""
           }
         },
         "requestBody": {

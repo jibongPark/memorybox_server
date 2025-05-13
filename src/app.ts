@@ -22,11 +22,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use(express.json());
 
+app.use(responseFormatter)
+app.use(authRouter);
+
 import { authToken } from './middleware/authenticate';
 app.use(authToken);
 
-app.use(responseFormatter)
-app.use(authRouter);
+
 app.use(calendarRouter);
 app.use(tripRouter);
 
