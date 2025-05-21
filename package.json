@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "swagger:generate": "ts-node swagger.ts",
+    "swagger:generate": "ts-node src/swagger.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "predev": "npm run swagger:generate",
     "dev": "nodemon src/app.ts",

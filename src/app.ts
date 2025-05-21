@@ -1,14 +1,14 @@
 import express, { Application, Request, Response } from 'express'
 import { responseFormatter } from './lib/response'
 import swaggerUi from 'swagger-ui-express';
-import swaggerFile from '../swagger-output.json'
+import swaggerFile from './swagger-output.json'
 
 import mongoose from "mongoose";
 
 import dotenv from "dotenv";
 dotenv.config()
 
-import { connectDB } from "../src/db";
+import { connectDB } from "./db";
 import { authRouter } from "./routes/auth";
 import { calendarRouter } from './routes/calendar';
 import tripRouter from './routes/trip';

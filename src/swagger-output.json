@@ -396,9 +396,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "400": {
             "description": "Bad Request"
           },
@@ -478,6 +475,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "lastFetch",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -489,6 +493,42 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/sync": {
+      "post": {
+        "description": "",
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ops": {
+                    "example": "any"
+                  },
+                  "todos": {
+                    "example": "any"
+                  },
+                  "any>>": {
+                    "example": "any"
+                  },
+                  "schedules": {
+                    "example": "any"
+                  },
+                  "diaries": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }

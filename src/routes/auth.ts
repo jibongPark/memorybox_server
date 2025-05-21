@@ -75,6 +75,7 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
         res.ok(200, "", {userName, accessToken, refreshToken});
 
     } catch (err: any) {
+        console.log(err)
         res
         .status(401)
         .json({ success: false, message: "인증 실패", detail: err.message });
