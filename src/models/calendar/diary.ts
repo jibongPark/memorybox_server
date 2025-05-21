@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 import { encrypt, decrypt } from "../../lib/crypto";
 
-interface Diary {
+export interface Diary extends Document {
     author: Schema.Types.ObjectId;
     date: Date;
     content: string;
@@ -31,6 +31,17 @@ const DiarySchema = new Schema<Diary>(
           ref:     "User",
         },
       ],
+    }, {
+      toJSON: {
+        getters: true,
+        virtuals: true,
+        versionKey: false,
+        transform: (_doc, ret) => {
+          ret.id = ret._id;
+          delete ret._id;
+        }
+      },
+      timestamps: true
     }
   );
   
