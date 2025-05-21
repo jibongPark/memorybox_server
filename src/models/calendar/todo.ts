@@ -1,7 +1,7 @@
 import { Schema, model, Document } from "mongoose";
 import { encrypt, decrypt } from "../../lib/crypto";
 
-interface Todo extends Document {
+export interface Todo extends Document {
     author: Schema.Types.ObjectId;
     title: string;
     endDate: Date;
@@ -45,8 +45,19 @@ const TodoSchema = new Schema<Todo>({
     {
         type: Schema.Types.ObjectId,
         ref: "User",
-    },
-    ],
+    }]},
+    {
+      toJSON: {
+        getters: true,
+        virtuals: true,
+        versionKey: false,
+        transform: (_doc, ret) => {
+          ret.id = ret._id;
+          delete ret._id;
+        }
+      },
+      timestamps: true
+    
 });
   
 TodoSchema.index({ shared: 1 });

@@ -87,8 +87,8 @@ authRouter.post("/refresh", async (req: Request<{}, {}, { refreshToken: string }
     const { refreshToken } = req.body;
     try {
         const decoded: any = jwt.decode(refreshToken);
-        if (!decoded?.socialId) throw new Error("유효하지 않은 토큰");
-        const socialId = decoded.socialId;
+        if (!decoded?.id) throw new Error("유효하지 않은 토큰");
+        const socialId = decoded.id;
 
         const user = await UserModel.findById(socialId);
         if (!user || !user.refreshSalt) {
@@ -104,13 +104,13 @@ authRouter.post("/refresh", async (req: Request<{}, {}, { refreshToken: string }
         const accessToken  = signAccessToken(user);
         const newRefreshToken = signRefreshToken(user);
 
-        res.ok(200, "", {accessToken, refreshToken});
+        res.ok(200, "", {accessToken, newRefreshToken});
 
     } catch (err: any) {
         console.error("refresh error:", err);
 
         res
-        .status(401)
+        .status(400)
         .json({ success: false, message: "인증 실패", detail: err.message });
     }
 });

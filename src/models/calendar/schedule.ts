@@ -1,17 +1,15 @@
-import { Schema, model, Types } from "mongoose"
+import { Schema, model, Types, Document } from "mongoose"
 import { encrypt, decrypt } from "../../lib/crypto";
 
-interface Schedule {
-    author: Types.ObjectId;
+export interface Schedule extends Document {
+    author: Schema.Types.ObjectId;
     title: string;
     startDate: Date;
     endDate: Date;
     memo: string;
     color: number;
-    shared: Types.ObjectId[];
+    shared: Schema.Types.ObjectId[];
 }
-
-interface ScheduleDoc extends Schedule, Document {} ;
 
 const ScheduleSchema = new Schema<Schedule>(
     {
@@ -60,7 +58,8 @@ const ScheduleSchema = new Schema<Schedule>(
           ret.id = ret._id;
           delete ret._id;
         }
-      }
+      },
+      timestamps: true
     });
 
     ScheduleSchema.index({ shared: 1 });
