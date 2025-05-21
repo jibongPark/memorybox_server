@@ -8,7 +8,8 @@
     "predev": "npm run swagger:generate",
     "dev": "nodemon src/app.ts",
     "prestart": "npm run swagger:generate",
-    "start": "node dist/app.ts"
+    "start": "node dist/app.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
