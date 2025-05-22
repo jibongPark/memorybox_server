@@ -12,6 +12,7 @@ import { connectDB } from "./db";
 import { authRouter } from "./routes/auth";
 import { calendarRouter } from './routes/calendar';
 import tripRouter from './routes/trip';
+import { friendRouter } from './routes/friends';
 
 connectDB();
 
@@ -31,6 +32,7 @@ app.use(authToken);
 
 app.use(calendarRouter);
 app.use(tripRouter);
+app.use(friendRouter);
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(port, () => {
