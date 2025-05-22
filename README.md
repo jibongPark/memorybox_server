@@ -10,5 +10,5 @@
 ---
 
 ## 📡 API 문서
-Swagger UI에서 실시간으로 확인할 수 있습니다: http://localhost:3000/api-docs
+Swagger UI에서 실시간으로 확인할 수 있습니다: http://bongbong.site/api-docs
 또는 `swagger-output.json` 파일을 사용해 OpenAPI 도구에서 로드할 수 있습니다.
