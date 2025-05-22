@@ -45,4 +45,4 @@ jobs:
           cd ~
           tar -xzf deploy.tar.gz
           npm install --production
-          pm2 reload my-app || pm2 start dist/app.js --name my-app
+          pm2 reload memoryBox || pm2 start dist/app.js --name memoryBox
