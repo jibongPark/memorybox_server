@@ -33,7 +33,7 @@ jobs:
         username: ${{ secrets.LIGHTSAIL_USER }}
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
         source: "deploy.tar.gz"
-        target: "~/"
+        target: "~/memorybox_server/"
 
     - name: SSH & Deploy on Lightsail
       uses: appleboy/ssh-action@v0.1.10
@@ -42,7 +42,8 @@ jobs:
         username: ${{ secrets.LIGHTSAIL_USER }}
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
         script: |
-          cd ~
+          cd ~/memorybox_server
+          rm -rf dist
           tar -xzf deploy.tar.gz
           npm install --production
           pm2 reload memoryBox || pm2 start dist/app.js --name memoryBox
