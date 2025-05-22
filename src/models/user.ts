@@ -5,7 +5,6 @@ export const friendStatus = {
     blocked: 'blocked'
 } as const;
 
-type FriendStatus = typeof friendStatus[keyof typeof friendStatus]
 
 export const loginType = {
     apple: 'apple',
@@ -14,11 +13,6 @@ export const loginType = {
 
 type LoginType = typeof loginType[keyof typeof loginType]
 
-interface Friend {
-    friendId: Schema.Types.ObjectId;
-    status: FriendStatus;
-    date: Date;
-}
 
 interface Invite {
     token: string;
@@ -32,15 +26,7 @@ export interface User extends Document {
     socialId: string;
     name: string;
     refreshSalt?: string;
-    friends: Friend[],
-    invite: Invite
 }
-
-const FriendSchema = new Schema<Friend>({
-    friendId: { type: Schema.Types.ObjectId, ref: "UserModel", required: true },
-    status: { type: String, enum: Object.values(friendStatus), required: true },
-    date: { type: Date }
-})
 
 const UserSchema = new Schema<User>(
 {

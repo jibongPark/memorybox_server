@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import { Router } from "express";
-import { FilterQuery, Types } from "mongoose";
-import { ScheduleModel, Schedule } from "../models/calendar/schedule";
-import { TodoModel, Todo } from "../models/calendar/todo";
-import { DiaryModel, Diary } from "../models/calendar/diary";
+import { Types } from "mongoose";
+import { ScheduleModel } from "../models/calendar/schedule";
+import { TodoModel } from "../models/calendar/todo";
+import { DiaryModel } from "../models/calendar/diary";
 
 export const calendarRouter = Router();
 
@@ -26,7 +25,7 @@ calendarRouter.post('/schedule', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.ok(201, "", schedule);
+        res.ok(201);
     } catch (err: any) {
         console.error("Schedule create error:", err);
         res.status(400).json({
@@ -89,7 +88,7 @@ calendarRouter.patch('/schedule/:id', async (req, res) => {
         });
     }
 
-    res.ok(200, "", schedule);
+    res.ok(200);
 
     } catch (err: any) {
         console.error("Schedule update error:", err);
@@ -153,7 +152,7 @@ calendarRouter.post('/todo', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.ok(201, "", todo);
+        res.ok(201);
     } catch (err: any) {
         console.error("todo create error:", err);
         res.status(400).json({
@@ -216,7 +215,7 @@ calendarRouter.patch('/todo/:id', async (req, res) => {
         });
     }
 
-    res.ok(200, "", todo);
+    res.ok(200);
 
     } catch (err: any) {
     console.error("Schedule update error:", err);
@@ -277,7 +276,7 @@ calendarRouter.post('/diary', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.ok(201, "", diary)
+        res.ok(201)
     } catch (err: any) {
         console.error("todo create error:", err);
         res.status(400).json({
@@ -318,7 +317,7 @@ calendarRouter.patch('/diary/:id', async (req, res) => {
         });
     }
 
-    res.ok(200, "", diary);
+    res.status(200).json({success: true})
 
     } catch (err: any) {
     console.error("Schedule update error:", err);
@@ -353,7 +352,7 @@ calendarRouter.delete('/diary/:id', async (req, res) => {
         if (!result) {
         // 문서가 없거나 권한 없는 경우
         res.status(404).json({ success: false, message: "삭제할 일기를 찾을 수 없거나 권한이 없습니다." });
-        return;
+        return
         }
 
         res.json({ success: true, message: "일기가 삭제되었습니다." });
@@ -368,7 +367,7 @@ calendarRouter.get('/calendar', async (req, res) => {
 /*  #swagger.tags = ['Calendar']
 */
     try {
-        const { startDate, endDate, lastFetch } = req.query;
+        const { startDate, endDate } = req.query;
         const userId = req.user?.id;
 
         if(!startDate || !endDate) {
@@ -377,147 +376,43 @@ calendarRouter.get('/calendar', async (req, res) => {
         }
 
         const start = new Date(startDate as string);
-        const end = new Date(endDate as string);
+    const end = new Date(endDate as string);
 
-        const todoFilter: FilterQuery<Todo> =  {
-            author: userId,
-            endDate: {
-                $gte: startDate,
-                $lte: endDate,
-            },
+    // todo: endDate가 범위 안에 있는 항목
+    const todos = await TodoModel.find({
+        author: userId,
+        endDate: {
+            $gte: start,
+            $lte: end
         }
-        
-        const scheduleFilter: FilterQuery<Schedule> =  {
-            author: userId,
-            $or: [
-                { startDate: { $gte: start, $lte: end } },
-                { endDate: { $gte: start, $lte: end } }
-            ]
+    });
+
+    // schedule: startDate 또는 endDate가 범위 안에 있는 항목
+    const schedules = await ScheduleModel.find({
+        author: userId,
+        $or: [
+            { startDate: { $gte: start, $lte: end } },
+            { endDate: { $gte: start, $lte: end } }
+        ]
+    });
+
+    // diary: date가 범위 안에 있는 항목
+    const diaries = await DiaryModel.find({
+        author: userId,
+        date: {
+            $gte: start,
+            $lte: end
         }
+    });
 
-        const diaryFilter: FilterQuery<Diary> = {
-            author: userId,
-            date: {
-                $gte: start,
-                $lte: end
-            }
-        }
-
-        if (typeof lastFetch === 'string' && lastFetch.trim() !== '') {
-            const lastFetchDate = new Date(lastFetch)
-            if (!isNaN(lastFetchDate.getTime())) {
-                todoFilter.updatedAt = { $gt: lastFetchDate }
-                scheduleFilter.updatedAt = { $gt: lastFetchDate }
-                diaryFilter.updatedAt = { $gt: lastFetchDate }
-            }
-        }
-
-        // todo: endDate가 범위 안에 있는 항목
-        const todos = await TodoModel.find(todoFilter).exec();
-
-        // schedule: startDate 또는 endDate가 범위 안에 있는 항목
-        const schedules = await ScheduleModel.find(scheduleFilter).exec();
-
-        // diary: date가 범위 안에 있는 항목
-        const diaries = await DiaryModel.find(diaryFilter).exec();
-
-        res.ok(200, "", {
-            todos,
-            schedules,
-            diaries
-        });
+    res.ok(200, "", {
+        todos,
+        schedules,
+        diaries
+    });
 
     } catch (err: any) {
         res.status(500).json({error: "조회 중 에러 발생"});
-    }
-});
-
-type OpPayload = {
-    type: 'todo' | 'schedule' | 'diary'
-    method: String
-    id: String
-}
-
-calendarRouter.post('/sync', async (req, res) => {
-    try {
-
-        const userId = req.user?.id;
-        const {
-            todos     = [] as Array<Record<string, any>>,
-            schedules = [] as Array<Record<string, any>>,
-            diaries   = [] as Array<Record<string, any>>
-        } = req.body
-
-        const ops: OpPayload[] = req.body.ops || [];
-
-        const modelMap: Record<'todo'|'schedule'|'diary', mongoose.Model<any>> = {
-            todo:     TodoModel,
-            schedule: ScheduleModel,
-            diary:    DiaryModel
-        };
-
-        for (const {type, method, id} of ops) {
-            const Model = modelMap[type]
-
-            if(method == "delete") {
-                await Model.deleteOne({
-                    author: userId,
-                    id: id
-                }).exec()
-            }
-        }
-
-        async function upsertAndReturn<T extends mongoose.Document>(
-            Model: mongoose.Model<T>,
-            items: Array<Record<string, any>>,
-            key: string = 'id'
-        ): Promise<T[]> {
-            if (!items.length) return []
-
-            const promises = items.map(item => {
-                const filter: Record<string, any> = { author: userId }
-
-                let id: Types.ObjectId
-                if(item[key]) {
-                    id = new Types.ObjectId(item[key])
-                } else {
-                    id = new Types.ObjectId()
-                    item[key] = id
-                }
-
-                filter['_id'] = id
-
-                return Model.findOneAndUpdate(
-                    filter,
-                    { $set: { ...item, author: userId } },
-                    {
-                        new: true,
-                        upsert: true,
-                        setDefaultsOnInsert: true
-                    }
-                ).exec() as Promise<T>
-            })
-
-            const docs = await Promise.all(promises);
-            return docs;
-        }
-
-        const [updatedTodos, updatedSchedules, updatedDiaries] = await Promise.all([
-            upsertAndReturn(TodoModel,     todos),
-            upsertAndReturn(ScheduleModel, schedules),
-            upsertAndReturn(DiaryModel,    diaries),
-        ]);
-        
-
-        res.ok(200, "", {
-            todos: updatedTodos,
-            schedules: updatedSchedules,
-            diaries: updatedDiaries
-        });
-
-    } catch (err: any) {
-        console.log(err)
-        res.error(400)
     }
 });
 
