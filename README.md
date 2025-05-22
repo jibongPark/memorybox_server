@@ -12,3 +12,8 @@
 ## 📡 API 문서
 Swagger UI에서 실시간으로 확인할 수 있습니다: http://bongbong.site/api-docs
 또는 `swagger-output.json` 파일을 사용해 OpenAPI 도구에서 로드할 수 있습니다.
+
+---
+
+## CI/CD
+이 프로젝트는 GitHub Actions 기반 CI/CD가 구축되어 있어, main 브랜치에 코드가 반영되면 AWS 서버에 자동으로 빌드·배포·재시작이 진행됩니다.
