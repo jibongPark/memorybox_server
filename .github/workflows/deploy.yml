@@ -1,0 +1,48 @@
+name: Deploy to Lightsail
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      run: npm run build
+
+    - name: Archive production artifacts
+      run: tar -czf deploy.tar.gz dist package.json package-lock.json
+
+    - name: Copy files to Lightsail via SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.LIGHTSAIL_HOST }}
+        username: ${{ secrets.LIGHTSAIL_USER }}
+        key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        source: "deploy.tar.gz"
+        target: "~/"
+
+    - name: SSH & Deploy on Lightsail
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.LIGHTSAIL_HOST }}
+        username: ${{ secrets.LIGHTSAIL_USER }}
+        key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        script: |
+          cd ~
+          tar -xzf deploy.tar.gz
+          npm install --production
+          pm2 reload my-app || pm2 start dist/app.js --name my-app
