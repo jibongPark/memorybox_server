@@ -9,7 +9,7 @@ export const friendRouter = express.Router();
 
 const domain = process.env.SERVER_DOMAIN
 
-friendRouter.post('/create-invite', async (req, res) => {
+friendRouter.post('/friend/createInvite', async (req, res) => {
   try {
     const userId = req.user?.id;
     // 1시간 뒤 만료
@@ -27,13 +27,13 @@ friendRouter.post('/create-invite', async (req, res) => {
     // 초대 URL 생성
     const inviteUrl = domain +`/invite/${token}`;
 
-    res.status(201).json({ inviteUrl, expiresAt });
+    res.ok(201, "", { inviteUrl, expiresAt });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create invite', error: err });
+    res.error(500, "Failed to create invite");
   }
 });
 
-friendRouter.post('/invite/:token', async (req, res) => {
+friendRouter.post('/friend/request/:token', async (req, res) => {
     try {
         const { token } = req.params;
         const userId = req.user?.id; // 초대를 받는 사람
@@ -76,10 +76,10 @@ friendRouter.post('/invite/:token', async (req, res) => {
     }
 });
 
-friendRouter.post('/accept-friend', async (req, res) => {
+friendRouter.post('/friend/accept/:friendId', async (req, res) => {
     try {
         const userId = req.user?.id;
-        const { friendId } = req.body;
+        const { friendId } = req.params;
 
         const friendship = await FriendsModel.findOne({
             userId: userId,
