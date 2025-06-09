@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { Router } from "express";
 import { Types } from "mongoose";
 import { ScheduleModel } from "../models/calendar/schedule";
@@ -416,3 +418,91 @@ calendarRouter.get('/calendar', async (req, res) => {
     }
 });
 
+type OpPayload = {
+    type: 'todo' | 'schedule' | 'diary'
+    method: String
+    id: String
+}
+
+calendarRouter.post('/sync', async (req, res) => {
+    try {
+
+        const userId = req.user?.id;
+        const {
+            todos     = [] as Array<Record<string, any>>,
+            schedules = [] as Array<Record<string, any>>,
+            diaries   = [] as Array<Record<string, any>>
+        } = req.body
+
+        const ops: OpPayload[] = req.body.ops || [];
+
+        const modelMap: Record<'todo'|'schedule'|'diary', mongoose.Model<any>> = {
+            todo:     TodoModel,
+            schedule: ScheduleModel,
+            diary:    DiaryModel
+        };
+
+        for (const {type, method, id} of ops) {
+            const Model = modelMap[type]
+
+            if(method == "delete") {
+                await Model.deleteOne({
+                    author: userId,
+                    id: id
+                }).exec()
+            }
+        }
+
+        async function upsertAndReturn<T extends mongoose.Document>(
+            Model: mongoose.Model<T>,
+            items: Array<Record<string, any>>,
+            key: string = 'id'
+        ): Promise<T[]> {
+            if (!items.length) return []
+
+            const promises = items.map(item => {
+                const filter: Record<string, any> = { author: userId }
+
+                let id: Types.ObjectId
+                if(item[key]) {
+                    id = new Types.ObjectId(item[key])
+                } else {
+                    id = new Types.ObjectId()
+                    item[key] = id
+                }
+
+                filter['_id'] = id
+
+                return Model.findOneAndUpdate(
+                    filter,
+                    { $set: { ...item, author: userId } },
+                    {
+                        new: true,
+                        upsert: true,
+                        setDefaultsOnInsert: true
+                    }
+                ).exec() as Promise<T>
+            })
+
+            const docs = await Promise.all(promises);
+            return docs;
+        }
+
+        const [updatedTodos, updatedSchedules, updatedDiaries] = await Promise.all([
+            upsertAndReturn(TodoModel,     todos),
+            upsertAndReturn(ScheduleModel, schedules),
+            upsertAndReturn(DiaryModel,    diaries),
+        ]);
+        
+
+        res.ok(200, "", {
+            todos: updatedTodos,
+            schedules: updatedSchedules,
+            diaries: updatedDiaries
+        });
+
+    } catch (err: any) {
+        console.log(err)
+        res.error(400)
+    }
+});

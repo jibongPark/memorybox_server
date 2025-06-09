@@ -68,11 +68,12 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
         user.refreshSalt = newSalt;
         await user.save();
 
-        const userName = user.name
+        const userName = user.name;
+        const uid = user._id;
         const accessToken  = signAccessToken(user);
         const refreshToken = signRefreshToken(user);
 
-        res.ok(200, "", {userName, accessToken, refreshToken});
+        res.ok(200, "", {userName, uid, accessToken, refreshToken});
 
     } catch (err: any) {
         console.log(err)
