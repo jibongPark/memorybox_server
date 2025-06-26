@@ -30,10 +30,7 @@ calendarRouter.post('/schedule', async (req, res) => {
         res.ok(201);
     } catch (err: any) {
         console.error("Schedule create error:", err);
-        res.status(400).json({
-            success: false,
-            message: err.message,
-        });
+        res.error(400, "err.message")
     }
 });
 
@@ -84,20 +81,16 @@ calendarRouter.patch('/schedule/:id', async (req, res) => {
     );
 
     if (!schedule) {
-        res.status(404).json({
-        success: false,
-        message: "찾을 수 없거나 권한이 없습니다.",
-        });
+        res.error(404, "찾을 수 없거나 권한이 없습니다.");
+        return;
     }
 
     res.ok(200);
 
     } catch (err: any) {
         console.error("Schedule update error:", err);
-        res.status(400).json({
-        success: false,
-        message: err.message
-        });
+        res.error(400, err.message);
+        return;
     }
 });
 
@@ -111,8 +104,8 @@ calendarRouter.delete('/schedule/:id', async (req, res) => {
     try {
         scheduleId = new Types.ObjectId(id);
     } catch (err: any) {
-        res.status(400).json({ success: false, message: "유효하지 않은 ID"})
-        return
+        res.error(400, "유효하지 않은 ID");
+        return;
     }
 
     try {
@@ -124,14 +117,14 @@ calendarRouter.delete('/schedule/:id', async (req, res) => {
 
         if (!result) {
         // 문서가 없거나 권한 없는 경우
-        res.status(404).json({ success: false, message: "삭제할 스케줄을 찾을 수 없거나 권한이 없습니다." });
-        return
+        res.error(404, "삭제할 스케줄을 찾을 수 없거나 권한이 없습니다.");
+        return;
         }
 
         res.json({ success: true, message: "스케줄이 삭제되었습니다." });
     } catch (err: any) {
         console.error("Schedule delete error:", err);
-        res.status(500).json({ success: false, message: "서버 오류로 삭제에 실패했습니다." });
+        res.error(500, "서버 오류로 삭제에 실패했습니다.");
     }
 });
 
@@ -157,10 +150,7 @@ calendarRouter.post('/todo', async (req, res) => {
         res.ok(201);
     } catch (err: any) {
         console.error("todo create error:", err);
-        res.status(400).json({
-            success: false,
-            message: err.message,
-        });
+        res.error(400, err.message);
     }
 });
 
@@ -211,21 +201,15 @@ calendarRouter.patch('/todo/:id', async (req, res) => {
     );
 
     if (!todo) {
-        res.status(404).json({
-        success: false,
-        message: "찾을 수 없거나 권한이 없습니다.",
-        });
+        res.error(404, "찾을 수 없거나 권한이 없습니다.");
+        return;
     }
 
     res.ok(200);
 
     } catch (err: any) {
-    console.error("Schedule update error:", err);
-    res.status(400).json({
-    success: false,
-    message: err.message,
-    });
-}
+      res.error(400, err.message);
+    }
 });
 
 calendarRouter.delete('/todo/:id', async (req, res) => {
@@ -238,8 +222,8 @@ calendarRouter.delete('/todo/:id', async (req, res) => {
     try {
         todoId = new Types.ObjectId(id);
     } catch (err: any) {
-        res.status(400).json({ success: false, message: "유효하지 않은 TODO ID"})
-        return
+        res.error(400, "유효하지 않은 TODO ID");
+        return;
     }
 
     try {
@@ -251,14 +235,13 @@ calendarRouter.delete('/todo/:id', async (req, res) => {
 
         if (!result) {
         // 문서가 없거나 권한 없는 경우
-        res.status(404).json({ success: false, message: "삭제할 할일을 찾을 수 없거나 권한이 없습니다." });
-        return
+        res.error(404, "삭제할 할일을 찾을 수 없거나 권한이 없습니다.");
+        return;
         }
 
-        res.json({ success: true, message: "할일이 삭제되었습니다." });
+        res.ok(204, "할일이 삭제되었습니다.");
     } catch (err: any) {
-        console.error("Schedule delete error:", err);
-        res.status(500).json({ success: false, message: "서버 오류로 할일 삭제에 실패했습니다." });
+        res.error(500, "서버 오류로 할일 삭제에 실패했습니다.");
     }
 });
 
@@ -278,13 +261,11 @@ calendarRouter.post('/diary', async (req, res) => {
             shared:    sharedIds,
         });
 
-        res.ok(201)
+        res.ok(201);
+
     } catch (err: any) {
         console.error("todo create error:", err);
-        res.status(400).json({
-            success: false,
-            message: err.message,
-        });
+        res.error(400, err.message);
     }
 });
 
@@ -313,21 +294,16 @@ calendarRouter.patch('/diary/:id', async (req, res) => {
     );
 
     if (!diary) {
-        res.status(404).json({
-        success: false,
-        message: "찾을 수 없거나 권한이 없습니다.",
-        });
+        res.error(404, "찾을 수 없거나 권한이 없습니다.");
+        return;
     }
 
-    res.status(200).json({success: true})
+    res.ok(200)
 
     } catch (err: any) {
-    console.error("Schedule update error:", err);
-    res.status(400).json({
-    success: false,
-    message: err.message,
-    });
-}
+        console.error("Schedule update error:", err);
+        res.error(400, err.message);
+    }
 });
 
 calendarRouter.delete('/diary/:id', async (req, res) => {
@@ -340,8 +316,8 @@ calendarRouter.delete('/diary/:id', async (req, res) => {
     try {
         diaryId = new Types.ObjectId(id);
     } catch (err: any) {
-        res.status(400).json({ success: false, message: "유효하지 않은 Diary ID"})
-        return
+        res.error(400, "유효하지 않은 Diary ID");
+        return;
     }
 
     try {
@@ -353,14 +329,13 @@ calendarRouter.delete('/diary/:id', async (req, res) => {
 
         if (!result) {
         // 문서가 없거나 권한 없는 경우
-        res.status(404).json({ success: false, message: "삭제할 일기를 찾을 수 없거나 권한이 없습니다." });
-        return
+        res.error(404, "삭제할 일기를 찾을 수 없거나 권한이 없습니다.");
+        return;
         }
 
-        res.json({ success: true, message: "일기가 삭제되었습니다." });
+        res.ok(204, "일기가 삭제되었습니다.");
     } catch (err: any) {
-        console.error("Schedule delete error:", err);
-        res.status(500).json({ success: false, message: "서버 오류로 일기 삭제에 실패했습니다." });
+        res.error(500, "서버 오류로 일기 삭제에 실패했습니다.");
     }
 });
 
@@ -373,48 +348,48 @@ calendarRouter.get('/calendar', async (req, res) => {
         const userId = req.user?.id;
 
         if(!startDate || !endDate) {
-            res.status(400).json({ message: 'startDate와 endDate를 모두 제공해야 합니다.' });
+            res.error(400, 'startDate와 endDate를 모두 제공해야 합니다.');
             return
         }
 
         const start = new Date(startDate as string);
-    const end = new Date(endDate as string);
+        const end = new Date(endDate as string);
 
-    // todo: endDate가 범위 안에 있는 항목
-    const todos = await TodoModel.find({
-        author: userId,
-        endDate: {
-            $gte: start,
-            $lte: end
-        }
-    });
+        // todo: endDate가 범위 안에 있는 항목
+        const todos = await TodoModel.find({
+            author: userId,
+            endDate: {
+                $gte: start,
+                $lte: end
+            }
+        });
 
-    // schedule: startDate 또는 endDate가 범위 안에 있는 항목
-    const schedules = await ScheduleModel.find({
-        author: userId,
-        $or: [
-            { startDate: { $gte: start, $lte: end } },
-            { endDate: { $gte: start, $lte: end } }
-        ]
-    });
+        // schedule: startDate 또는 endDate가 범위 안에 있는 항목
+        const schedules = await ScheduleModel.find({
+            author: userId,
+            $or: [
+                { startDate: { $gte: start, $lte: end } },
+                { endDate: { $gte: start, $lte: end } }
+            ]
+        });
 
-    // diary: date가 범위 안에 있는 항목
-    const diaries = await DiaryModel.find({
-        author: userId,
-        date: {
-            $gte: start,
-            $lte: end
-        }
-    });
+        // diary: date가 범위 안에 있는 항목
+        const diaries = await DiaryModel.find({
+            author: userId,
+            date: {
+                $gte: start,
+                $lte: end
+            }
+        });
 
-    res.ok(200, "", {
-        todos,
-        schedules,
-        diaries
-    });
+        res.ok(200, "", {
+            todos,
+            schedules,
+            diaries
+        });
 
     } catch (err: any) {
-        res.status(500).json({error: "조회 중 에러 발생"});
+        res.error(500, "조회 중 에러 발생");
     }
 });
 
@@ -502,7 +477,6 @@ calendarRouter.post('/sync', async (req, res) => {
         });
 
     } catch (err: any) {
-        console.log(err)
-        res.error(400)
+        res.error(400, "동기 작업에 실패했습니다.");
     }
 });

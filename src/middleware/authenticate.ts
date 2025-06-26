@@ -10,7 +10,7 @@ export const authToken: RequestHandler = (req, res, next) => {
 
     const token = req.get('Authorization')?.split('Bearer ')[1];
     if (!token) {
-        res.status(401).send("No token");
+        res.error(401, "로그인을 해주세요");
         return;
     }
   
@@ -19,7 +19,7 @@ export const authToken: RequestHandler = (req, res, next) => {
       req.user = payload;
       next();
     } catch {
-      res.status(401).send("Invalid token");
+      res.error(401, "사용자 인증에 실패했습니다 \n 다시 로그인을 해주세요");
       return;
     }
 }

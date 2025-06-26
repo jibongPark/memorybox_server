@@ -148,7 +148,7 @@ tripRouter.post('/trip', upload.array('images'), async (req, res) => {
     res.ok(201, "", {tripData})
   } catch (error) {
     console.error('Trip 저장 오류:', error);
-    res.status(500).json({ message: '서버 오류' });
+    res.error(500, '서버 오류');
   }
 });
 
@@ -163,8 +163,8 @@ tripRouter.patch('/trip/:id', upload.array('images'), async (req, res) => {
         // 1) Trip 문서 조회
         const trip = await TripModel.findOne({ _id: tripId, author: userId });
         if (!trip) {
-          res.status(404).json({ message: 'Trip not found' });
-          return
+            res.ok(404, 'Trip not found');
+            return;
         }
 
         // 2) 유지할 이미지 파싱
@@ -232,8 +232,8 @@ tripRouter.delete('/trip/:id', async (req, res) => {
     try {
         tripId = new Types.ObjectId(id);
     } catch (err: any) {
-        res.status(400).json({ success: false, message: "유효하지 않은 trip ID"})
-        return
+        res.error(400, "유효하지 않은 trip ID");
+        return;
     }
 
     try {
@@ -243,13 +243,13 @@ tripRouter.delete('/trip/:id', async (req, res) => {
         });
 
         if(!trip) {
-            res.status(400).json({ success: false, message: "trip del error"})
-            return
+            res.error(400, "trip del error");
+            return;
         }
 
         res.json({ success: true, message: "여행이 삭제되었습니다." });
     } catch (err: any) {
-        res.status(500).json({ success: false, message: "서버 오류로 삭제에 실패했습니다." });
+        res.error(500, "서버 오류로 삭제에 실패했습니다.");
     }
 });
 
