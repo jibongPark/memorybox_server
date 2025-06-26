@@ -493,6 +493,42 @@
         }
       }
     },
+    "/sync": {
+      "post": {
+        "description": "",
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ops": {
+                    "example": "any"
+                  },
+                  "todos": {
+                    "example": "any"
+                  },
+                  "any>>": {
+                    "example": "any"
+                  },
+                  "schedules": {
+                    "example": "any"
+                  },
+                  "diaries": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/trip": {
       "post": {
         "tags": [
@@ -811,13 +847,20 @@
         }
       }
     },
-    "/create-invite": {
+    "/friend/request/{receiver}": {
       "post": {
         "description": "",
+        "parameters": [
+          {
+            "name": "receiver",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "Created"
-          },
           "401": {
             "description": "Unauthorized"
           },
@@ -827,12 +870,12 @@
         }
       }
     },
-    "/invite/{token}": {
+    "/friend/accept/{friendId}": {
       "post": {
         "description": "",
         "parameters": [
           {
-            "name": "token",
+            "name": "friendId",
             "in": "path",
             "required": true,
             "schema": {
@@ -841,38 +884,8 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request"
-          },
           "401": {
             "description": "Unauthorized"
-          },
-          "409": {
-            "description": "Conflict"
-          }
-        }
-      }
-    },
-    "/accept-friend": {
-      "post": {
-        "description": "",
-        "responses": {
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "friendId": {
-                    "example": "any"
-                  }
-                }
-              }
-            }
           }
         }
       }
