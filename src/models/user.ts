@@ -45,6 +45,16 @@ const UserSchema = new Schema<User>(
         required: true,
     },
     refreshSalt: { type: String }
+},{
+    toJSON: {
+        getters: true,
+        virtuals: true,
+        versionKey: false,
+        transform: (_doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        }
+    },
 });
 
 const InviteSchema = new Schema<Invite>({
