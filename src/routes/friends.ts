@@ -3,7 +3,7 @@ import express from 'express';
 import { InviteModel } from '../models/inviteToken';
 import { FriendsModel } from '../models/friendship';
 import crypto from 'crypto'
-import { UserModel } from '../models/user';
+import { User, UserModel } from '../models/user';
 
 export const friendRouter = express.Router();
 
@@ -32,7 +32,7 @@ friendRouter.post('/friend/request/:receiver', async (req, res) => {
             status: { $in: ['pending', 'accepted'] }
         });
         if (alreadyFriend) {
-            res.error(409, '이미 친구인 유저입니다.');
+            res.error(409, '이미 친구거나 요청한 유저입니다.');
             return;
         }
 
@@ -81,7 +81,11 @@ friendRouter.post('/friend/accept/:friendId', async (req, res) => {
         friendship.status = 'accepted';
         await friendship.save();
 
-        res.ok(200, "친구수락 완료");
+        const friend = await UserModel.findById(friendId,
+            {_id: 1, name: 1}
+        )
+
+        res.ok(200, "친구수락 완료", friend);
     } catch (err: any) {
         res.error(500, "친구수락 실패"+err);
     }
@@ -119,6 +123,46 @@ friendRouter.get('/friends', async (req, res) => {
     }
 });
 
+friendRouter.get('/friendRequests', async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        const friendships = await FriendsModel.find({
+            status: "pending",
+            $or: [
+                { userId: userId },
+                { friendId: userId }
+            ]
+        });
+
+        // 모든 관련 유저 ID를 모아 한 번에 조회
+        const userIds = Array.from(new Set(
+            friendships.flatMap(f => [f.userId.toString(), f.friendId.toString()])
+        ));
+
+        // 해당 유저 ID에 대한 유저 정보 조회
+        const users = await UserModel.find(
+            { _id: { $in: userIds } },
+            { _id: 1, name: 1 }
+        );
+
+        // _id 기준으로 빠르게 유저 이름을 찾기 위한 Map 생성
+        const userMap = new Map(users.map(user => [user._id.toString(), user.name]));
+
+        // 원하는 형식으로 변환
+        const result = friendships.map(f => ({
+            senderId: f.userId.toString(),
+            senderName: userMap.get(f.userId.toString()) || "",
+            receiverId: f.friendId.toString(),
+            receiverName: userMap.get(f.friendId.toString()) || ""
+        }));
+
+        res.ok(200, "", result);
+    } catch (err) {
+        res.error(500, "친구 요청 조회 실패: " + err);
+    }
+});
+
 friendRouter.delete('/friend/:friendId', async (req, res) => {
     try {
         const userId = req.user?.id;
@@ -130,8 +174,12 @@ friendRouter.delete('/friend/:friendId', async (req, res) => {
                 { userId: friendId, friendId: userId }
             ]
         });
+        
+        const friend = await UserModel.findById(friendId,
+            {_id: 1, name: 1}
+        )
 
-        res.ok(200, "친구삭제 완료");
+        res.ok(200, "친구삭제 완료", friend);
 
     } catch (err) {
         res.error(500, "친구삭제 실패 "+err);
