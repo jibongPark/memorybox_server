@@ -71,6 +71,16 @@
         }
       }
     },
+    "/deleteUser": {
+      "delete": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/schedule": {
       "post": {
         "tags": [
