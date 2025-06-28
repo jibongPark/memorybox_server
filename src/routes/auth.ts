@@ -76,10 +76,8 @@ authRouter.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response)
         res.ok(200, "", {userName, uid, accessToken, refreshToken});
 
     } catch (err: any) {
-        console.log(err)
-        res
-        .status(401)
-        .json({ success: false, message: "인증 실패", detail: err.message });
+        console.log(err);
+        res.error(401, "로그인 실패 : " +err.message);
     }
 });
 
@@ -111,9 +109,43 @@ authRouter.post("/refresh", async (req: Request<{}, {}, { refreshToken: string }
     } catch (err: any) {
         console.error("refresh error:", err);
 
-        res
-        .status(400)
-        .json({ success: false, message: "인증 실패", detail: err.message });
+        res.error(400, "토큰 갱신 실패 : " +err.message);
     }
 });
 
+import { authToken } from '../middleware/authenticate';
+import { TripModel } from "../models/map/trip";
+import { FriendsModel } from "../models/friendship";
+import { ScheduleModel } from "../models/calendar/schedule";
+import { TodoModel } from "../models/calendar/todo";
+import { DiaryModel } from "../models/calendar/diary";
+
+
+authRouter.delete("/deleteUser", 
+    authToken,
+    async (req: Request<{}, {}, { refreshToken: string }>, res: Response) => {
+        const userId = req.user?.id
+
+        try {
+
+            await TripModel.deleteMany({ author: userId });
+
+            await FriendsModel.deleteMany({ 
+                $or: [{ userId: userId }, { friendId: userId }]
+            });
+
+            await ScheduleModel.deleteMany({ author: userId });
+
+            await TodoModel.deleteMany({ author: userId});
+
+            await DiaryModel.deleteMany({ author: userId });
+
+            await UserModel.deleteOne({ _id: userId });
+
+            res.ok(200, "회원 탈퇴가 완료되었습니다.");
+
+        } catch (err: any) {
+            res.error(500, "회원 탈퇴에 문제가 생겼습니다." + err.message);
+        }
+
+});
