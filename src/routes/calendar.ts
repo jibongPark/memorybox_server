@@ -239,7 +239,7 @@ calendarRouter.delete('/todo/:id', async (req, res) => {
         return;
         }
 
-        res.ok(204, "할일이 삭제되었습니다.");
+        res.ok(200, "할일이 삭제되었습니다.");
     } catch (err: any) {
         res.error(500, "서버 오류로 할일 삭제에 실패했습니다.");
     }
@@ -333,7 +333,7 @@ calendarRouter.delete('/diary/:id', async (req, res) => {
         return;
         }
 
-        res.ok(204, "일기가 삭제되었습니다.");
+        res.ok(200, "일기가 삭제되었습니다.");
     } catch (err: any) {
         res.error(500, "서버 오류로 일기 삭제에 실패했습니다.");
     }
