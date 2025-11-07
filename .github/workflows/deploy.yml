@@ -3,6 +3,7 @@ name: Deploy to Lightsail
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -32,8 +33,9 @@ jobs:
         host: ${{ secrets.LIGHTSAIL_HOST }}
         username: ${{ secrets.LIGHTSAIL_USER }}
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        port: 30000
         source: "deploy.tar.gz"
-        target: "~/memorybox_server/"
+        target: "C:/memorybox_server/"
 
     - name: SSH & Deploy on Lightsail
       uses: appleboy/ssh-action@v0.1.10
@@ -41,9 +43,6 @@ jobs:
         host: ${{ secrets.LIGHTSAIL_HOST }}
         username: ${{ secrets.LIGHTSAIL_USER }}
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        port: 30000
         script: |
-          cd ~/memorybox_server
-          rm -rf dist
-          tar -xzf deploy.tar.gz
-          npm install --production
-          pm2 reload memoryBox || pm2 start dist/app.js --name memoryBox
+          powershell -NoProfile -ExecutionPolicy Bypass -File C:\memorybox_server\installActions.ps1
